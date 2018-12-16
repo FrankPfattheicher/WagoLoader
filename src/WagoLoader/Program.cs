@@ -1,39 +1,26 @@
 ﻿using System;
-using System.Net.Sockets;
-using System.Text;
+using System.Reflection;
+using WagoLoader.Network;
+using WagoLoader.Wago;
 
 namespace WagoLoader
 {
     class Program
     {
-        private static string ipAddress = "192.168.2.165";
-
-        private static int rqDeviceInfoPort = 6626;
-
-        private static byte[] rqDeviceInfo = new byte[] {
-    0x88, 0x12, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x08, 0x01
-};
-
         static void Main(string[] args)
         {
-            Console.WriteLine("WAGO Loader");
+            Console.WriteLine("WAGO Loader v" + Assembly.GetEntryAssembly().GetName().Version);
+            Console.WriteLine();
 
-
-            using (var client = new TcpClient())
+            var addr = Browser.FindIpV4Devices();
+            foreach (var address in addr)
             {
-                client.Connect(ipAddress, rqDeviceInfoPort);
-                var stream = client.GetStream();
-                stream.ReadTimeout = 1000;
-                stream.Write(rqDeviceInfo, 0, rqDeviceInfo.Length);
-
-                var rxBuffer = new byte[4096];
-                var rxLength = stream.Read(rxBuffer, 0, rxBuffer.Length);
-
-                var text = Encoding.ASCII.GetString(rxBuffer, 28, rxLength - 29);
-                text = text.Replace(";", Environment.NewLine);
-                Console.WriteLine(text);
+                Console.Write(address + " : ");
+                var di = WagoService.QueryDeviceInfo(address.ToString());
+                Console.WriteLine(di != null ? di.ToString() : "no WAGO");
             }
 
+            Console.WriteLine("done.");
             Console.ReadLine();
         }
     }

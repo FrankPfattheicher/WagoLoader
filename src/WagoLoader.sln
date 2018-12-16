@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WagoLoader", "WagoLoader\WagoLoader.csproj", "{4FFCC2C4-69B1-4286-8AB2-5BD9D20DA443}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WagoLoader", "WagoLoader\WagoLoader.csproj", "{4FFCC2C4-69B1-4286-8AB2-5BD9D20DA443}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4D33FD59-422B-416A-B947-0FAB384EA81E}"
+	ProjectSection(SolutionItems) = preProject
+		ReleaseNotes.md = ReleaseNotes.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
