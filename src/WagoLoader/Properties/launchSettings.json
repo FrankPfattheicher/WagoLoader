@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WagoLoader": {
+      "commandName": "Project",
+      "commandLineArgs": "-?"
+    }
+  }
+}
