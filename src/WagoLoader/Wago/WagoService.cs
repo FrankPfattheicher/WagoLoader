@@ -40,5 +40,30 @@ namespace WagoLoader.Wago
             return null;
         }
 
+        public static void ResetDevice(string ipAddress)
+        {
+            var rqDeviceReset = new byte[] {
+                0x88, 0x12, 0x30, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x02, 0x01, 0x00, 0x00, 0x2d, 0x00
+            };
+
+            try
+            {
+                using (var client = new TcpClient())
+                {
+                    client.Connect(ipAddress, PortNumber);
+                    var stream = client.GetStream();
+                    stream.ReadTimeout = 1000;
+                    stream.Write(rqDeviceReset, 0, rqDeviceReset.Length);
+
+                    var rxBuffer = new byte[4096];
+                    stream.Read(rxBuffer, 0, rxBuffer.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.Message);
+            }
+        }
+
     }
 }

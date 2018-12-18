@@ -25,7 +25,7 @@ namespace WagoLoader.Network
                 }
             }
 
-            var tasks = addresses.Select(ip => new Ping().SendPingAsync(ip, 500));
+            var tasks = addresses.Select(ip => new Ping().SendPingAsync(ip, 1000));
             var results = Task.WhenAll(tasks).Result;
 
             addresses = results

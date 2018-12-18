@@ -20,6 +20,7 @@ namespace WagoLoader
             };
             app.HelpOption("-?|-h|--help");
             app.Command("scan", ScanDevices);
+            app.Command("reset", ResetDevice);
 
             if (args.Length < 1)
             {
@@ -50,7 +51,29 @@ namespace WagoLoader
                 Console.WriteLine("done.");
                 return 0;
             });
-
         }
+
+        private static void ResetDevice(CommandLineApplication command)
+        {
+            command.Description = "Reset specified WAGO controller";
+
+            var controller = command.Argument(
+                        "controller",
+                        "The ip address of the controller");
+
+            command.OnExecute(() =>
+            {
+                if (string.IsNullOrEmpty(controller.Value))
+                {
+                    Console.WriteLine($"ERROR: A controller address has to be specified.");
+                    return 1;
+                }
+                Console.WriteLine($"Resetting {controller.Value}...");
+                WagoService.ResetDevice(controller.Value);
+                Console.WriteLine("done.");
+                return 0;
+            });
+        }
+
     }
 }
