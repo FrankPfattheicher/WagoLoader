@@ -2,7 +2,7 @@
   "profiles": {
     "WagoLoader": {
       "commandName": "Project",
-      "commandLineArgs": "reset 192.168.2.165"
+      "commandLineArgs": "load 192.168.2.165"
     }
   }
 }
