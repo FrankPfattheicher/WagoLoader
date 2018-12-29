@@ -1,0 +1,33 @@
+{
+  "description": "test package",
+  "version": "1.0.0",
+  "system": {
+    "product": "750-8202/0025-0002"
+  },
+  "users": {
+    "linux": [
+      {
+        "name": "root",
+        "password": "test"
+      },
+      {
+        "name": "admin",
+        "password": "test"
+      },
+      {
+        "name": "user",
+        "password": "test"
+      }
+    ],
+    "wbm": [
+      {
+        "name": "admin",
+        "password": "test"
+      },
+      {
+        "name": "user",
+        "password": "test"
+      }
+    ]
+  }
+}
