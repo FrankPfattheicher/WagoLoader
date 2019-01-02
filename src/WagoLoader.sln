@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ReleaseNotes.md = ReleaseNotes.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WagoLoader.Test", "WagoLoader.Test\WagoLoader.Test.csproj", "{1E5BD26B-AFF4-4835-9B50-E0E9C8A29861}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{4FFCC2C4-69B1-4286-8AB2-5BD9D20DA443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FFCC2C4-69B1-4286-8AB2-5BD9D20DA443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FFCC2C4-69B1-4286-8AB2-5BD9D20DA443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E5BD26B-AFF4-4835-9B50-E0E9C8A29861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E5BD26B-AFF4-4835-9B50-E0E9C8A29861}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E5BD26B-AFF4-4835-9B50-E0E9C8A29861}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E5BD26B-AFF4-4835-9B50-E0E9C8A29861}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

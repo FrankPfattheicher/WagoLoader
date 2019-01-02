@@ -1,4 +1,5 @@
 
+* 0.0.7 - Set linux and WBM users.
 * 0.0.6 - Pack command added.
 * 0.0.5 - QueryDevice command added. Check root password added.
 * 0.0.4 - ResetDevice command added.

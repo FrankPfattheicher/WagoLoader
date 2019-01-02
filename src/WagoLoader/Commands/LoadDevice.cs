@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.CommandLineUtils;
+using Renci.SshNet;
 using WagoLoader.Loader;
 using WagoLoader.Wago;
 
@@ -98,10 +99,49 @@ namespace WagoLoader.Commands
             }
 
             // set linux users as given in the packet
-            //TODO
+            foreach (var linuxUser in package.Specification.Users.Linux)
+            {
+                Console.WriteLine(shell.ChangePassword(rootPwd, linuxUser.Name, linuxUser.Password)
+                    ? $"Changed password for linux user {linuxUser.Name}."
+                    : $"ERROR: Failed to change password for linux user {linuxUser.Name}.");
+
+                if (linuxUser.Name == "root")
+                {
+                    // save new root password
+                    rootPwd = linuxUser.Password;
+                }
+            }
 
             // set WBM users as given in the packet
-            //TODO
+            const string pwdFileName = "lighttpd-htpasswd.user";
+            try
+            {
+                File.WriteAllText(pwdFileName, "");
+                var pwdFile = new Passwords(pwdFileName);
+                foreach (var wbmUser in package.Specification.Users.Wbm)
+                {
+                    pwdFile.SetPassword(wbmUser.Name, wbmUser.Password);
+                }
+
+                var inf = new FileInfo(pwdFileName);
+                var scp = new ScpClient(_controller.Value, "root", rootPwd);
+                scp.Connect();
+                if (!scp.IsConnected)
+                {
+                    Console.WriteLine("ERROR: Could connect upload SCP.");
+                    return 1;
+                }
+                scp.Upload(inf, $"/etc/lighttpd/{pwdFileName}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: Failed to upload WBM passwords: " + ex.Message);
+                return 1;
+            }
+            finally
+            {
+                File.Delete(pwdFileName);
+            }
 
             // transfer CodeSys project
             //TODO
