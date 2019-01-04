@@ -6,25 +6,41 @@ The contents to be transferred to the controller are zipped into a package with 
 
 ## package.json
 
-{
-    "users": [
-        { "name": "admin", "password": "test" }
-    ],
-    "fileSystem": [
-        {
-            "condition": "exists /etc/lighttpd/wbm_redirect.conf",
-            "source": "/etc/lighttpd/redirect.conf",
-            "action": "replace"
-        },
-        {
-            "condition": "exists /etc/lighttpd/redirect_default.conf",
-            "source": "/etc/lighttpd/redirect.conf",
-            "action": "replace"
-        },
-        {
-            "source": "/var/www/wbm/usr/index.html",
-            "action": "create"
-        }
+Example package configuration replacing controller's default website.
 
+``` JSON
+{
+  "description": "test package",
+  "version": "1.0.0",
+  "system": {
+    "product": "750-8202/0025-0001;750-8202/0025-0002"
+  },
+  "users": {
+    "linux": [
+      {
+        "name": "root",
+        "password": "test"
+      },
+      {
+        "name": "admin",
+        "password": "test"
+      },
+      {
+        "name": "user",
+        "password": "test"
+      }
+    ],
+    "wbm": [
+      {
+        "name": "admin",
+        "password": "test"
+      },
+      {
+        "name": "user",
+        "password": "test"
+      }
     ]
+  }
 }
+```
+

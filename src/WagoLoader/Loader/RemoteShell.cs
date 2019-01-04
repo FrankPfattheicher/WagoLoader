@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 
 namespace WagoLoader.Loader
 {

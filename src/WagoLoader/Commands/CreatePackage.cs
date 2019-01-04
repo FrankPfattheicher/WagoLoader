@@ -12,6 +12,7 @@ namespace WagoLoader.Commands
     {
         private static CommandArgument _srcPath;
         private static CommandArgument _package;
+        private static CommandOption _dstPath;
 
         internal static void Create(CommandLineApplication command)
         {
@@ -23,6 +24,8 @@ namespace WagoLoader.Commands
             _package = command.Argument(
                 "package",
                 "The package name to be created (default is the project name)");
+
+            _dstPath = command.Option("-o", "output path", CommandOptionType.SingleValue);
 
             command.OnExecute(() => Execute());
         }
@@ -41,6 +44,15 @@ namespace WagoLoader.Commands
                 return 1;
             }
             var destPath = sourcePath;
+            if(!string.IsNullOrEmpty(_dstPath.Value()))
+            {
+                destPath = _dstPath.Value();
+                if (!Directory.Exists(destPath))
+                {
+                    Console.WriteLine($"ERROR: Output path to create package not found: {destPath}");
+                    return 1;
+                }
+            }
 
             var packageName = _package.Value;
             if (string.IsNullOrEmpty(packageName))
@@ -62,11 +74,8 @@ namespace WagoLoader.Commands
                 }
             }
 
-            var ext = Path.GetExtension(packageName);
-            if (string.IsNullOrEmpty(ext))
-            {
-                packageName += ".wago";
-            }
+            packageName = Path.GetFileNameWithoutExtension(packageName) + ".wago";
+            packageName = Path.Combine(destPath, packageName);
 
             var packageSpec = Path.Combine(sourcePath, WagoPackage.SpecFileName);
             if (!File.Exists(packageSpec))
@@ -74,6 +83,26 @@ namespace WagoLoader.Commands
                 Console.WriteLine($"ERROR: No package specification file '{WagoPackage.SpecFileName}' found in {sourcePath}.");
                 return 1;
             }
+
+            var programName = Directory.EnumerateFiles(sourcePath, $"{Path.GetFileNameWithoutExtension(packageName)}.prg").FirstOrDefault();
+            if (programName == null)
+            {
+                programName = Directory.EnumerateFiles(sourcePath, "*.prg").FirstOrDefault();
+                if (programName == null)
+                {
+                    Console.WriteLine($"ERROR: No project file found in source path {sourcePath}.");
+                    return 1;
+                }
+                Console.WriteLine($"Using project file {Path.GetFileNameWithoutExtension(programName)}");
+            }
+            var checkName = Directory.EnumerateFiles(sourcePath, $"{Path.GetFileNameWithoutExtension(programName)}.chk").FirstOrDefault();
+            if (checkName == null)
+            {
+                Console.WriteLine($"ERROR: No checksum file ({Path.GetFileNameWithoutExtension(programName)}.chk) found in source path {sourcePath}.");
+                return 1;
+            }
+
+
 
             Console.WriteLine();
 
@@ -86,7 +115,25 @@ namespace WagoLoader.Commands
 
             using (var zip = ZipFile.Open(packageName, ZipArchiveMode.Create))
             {
+                // add package spec file
                 zip.CreateEntryFromFile(packageSpec, WagoPackage.SpecFileName);
+
+                // add project files
+                zip.CreateEntryFromFile(programName, "DEFAULT.PRG");
+                zip.CreateEntryFromFile(checkName, "DEFAULT.CHK");
+
+                // add content files
+                var contentDir = Path.Combine(sourcePath, "FileSystem");
+                if (Directory.Exists(contentDir))
+                {
+                    var contentFiles = Directory.EnumerateFiles(contentDir, "*.*", SearchOption.AllDirectories);
+                    foreach (var contentFile in contentFiles)
+                    {
+                        var contentName = "filesystem" + contentFile.Substring(contentDir.Length);
+                        zip.CreateEntryFromFile(contentFile, contentName);
+                    }
+                }
+
             }
 
             Console.WriteLine("Package created successfully.");

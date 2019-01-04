@@ -7,6 +7,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using Renci.SshNet;
 using WagoLoader.Loader;
 using WagoLoader.Wago;
+// ReSharper disable StringLiteralTypo
 
 namespace WagoLoader.Commands
 {
@@ -68,8 +69,8 @@ namespace WagoLoader.Commands
                 return 1;
             }
 
-            var package = new WagoPackage(packageName);
-            if (!package.LoadPackage())
+            var package = WagoPackage.Load(packageName);
+            if (package == null)
             {
                 return 1;
             }
@@ -80,7 +81,11 @@ namespace WagoLoader.Commands
                 return 1;
             }
 
-            Console.WriteLine($"Installing package {Path.GetFileNameWithoutExtension(packageName)} on WAGO controller {di.ProductSerialNumber}");
+            Console.WriteLine();
+            Console.WriteLine($"Installing package {Path.GetFileNameWithoutExtension(packageName)}");
+            Console.WriteLine($"    {package.Specification.Description} - version {package.Specification.Version}");
+            Console.WriteLine($"    on WAGO controller {di.ProductSerialNumber}");
+            Console.WriteLine();
 
             var shell = new RemoteShell(_controller.Value);
 
@@ -113,6 +118,7 @@ namespace WagoLoader.Commands
             }
 
             // set WBM users as given in the packet
+            Console.WriteLine("Loading WBM users...");
             const string pwdFileName = "lighttpd-htpasswd.user";
             try
             {
@@ -124,14 +130,17 @@ namespace WagoLoader.Commands
                 }
 
                 var inf = new FileInfo(pwdFileName);
-                var scp = new ScpClient(_controller.Value, "root", rootPwd);
-                scp.Connect();
-                if (!scp.IsConnected)
+                using (var scp = new ScpClient(_controller.Value, "root", rootPwd))
                 {
-                    Console.WriteLine("ERROR: Could connect upload SCP.");
-                    return 1;
+                    scp.RemotePathTransformation = RemotePathTransformation.ShellQuote;
+                    scp.Connect();
+                    if (!scp.IsConnected)
+                    {
+                        Console.WriteLine("ERROR: Could connect upload SCP.");
+                        return 1;
+                    }
+                    scp.Upload(inf, $"/etc/lighttpd/{pwdFileName}");
                 }
-                scp.Upload(inf, $"/etc/lighttpd/{pwdFileName}");
             }
             catch (Exception ex)
             {
@@ -144,12 +153,103 @@ namespace WagoLoader.Commands
             }
 
             // transfer CodeSys project
-            //TODO
+            var tmpPrg = Path.GetTempFileName();
+            var tmpChk = Path.GetTempFileName();
+            try
+            {
+                Console.WriteLine("Loading Codesys project...");
+
+                using (var scp = new ScpClient(_controller.Value, "root", rootPwd))
+                {
+                    scp.RemotePathTransformation = RemotePathTransformation.ShellQuote;
+                    scp.Connect();
+                    if (!scp.IsConnected)
+                    {
+                        Console.WriteLine("ERROR: Could connect upload project.");
+                        return 1;
+                    }
+
+                    package.ExtractFile("DEFAULT.PRG", tmpPrg);
+                    var prg = new FileInfo(tmpPrg);
+                    scp.Upload(prg, "/home/codesys/DEFAULT.PRG");
+
+                    package.ExtractFile("DEFAULT.CHK", tmpChk);
+                    var chk = new FileInfo(tmpChk);
+                    scp.Upload(chk, "/home/codesys/DEFAULT.CHK");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: Failed to upload project files: " + ex.Message);
+                return 1;
+            }
+            finally
+            {
+                if (File.Exists(tmpPrg)) File.Delete(tmpPrg);
+                if (File.Exists(tmpChk)) File.Delete(tmpChk);
+            }
+
 
             // transfer file system files
-            //TODO
+            var contentFiles = package.GetPackageFiles()
+                .Where(fn => fn.StartsWith("filesystem", StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+            if (contentFiles.Count > 0)
+            {
+                Console.WriteLine("Creating file system content directories...");
+                var contentDirectories = contentFiles
+                    .Select(cf => Path.GetDirectoryName(cf.Substring("filesystem".Length)).Replace(Path.DirectorySeparatorChar, '/'))
+                    .Distinct()
+                    .ToList();
+                foreach (var contentDirectory in contentDirectories)
+                {
+                    shell.ExecCommand("root", rootPwd, $"mkdir {contentDirectory}");
+                }
 
-            Console.WriteLine("done.");
+                Console.WriteLine($"Loading {contentFiles.Count} file system content files...");
+                foreach (var contentFile in contentFiles)
+                {
+                    var tmpFile = Path.GetTempFileName();
+                    try
+                    {
+                        using (var scp = new ScpClient(_controller.Value, "root", rootPwd))
+                        {
+                            scp.RemotePathTransformation = RemotePathTransformation.ShellQuote;
+                            scp.Connect();
+                            if (!scp.IsConnected)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("ERROR: Could connect upload content.");
+                                return 1;
+                            }
+
+                            package.ExtractFile(contentFile, tmpFile);
+                            var sourceFile = new FileInfo(tmpFile);
+                            var targetFileName = contentFile.Substring("filesystem".Length).Replace(Path.DirectorySeparatorChar, '/');
+
+                            Console.Write(".");
+                            scp.Upload(sourceFile, targetFileName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine($"ERROR: Failed to upload content file {contentFile}: " + ex.Message);
+                        return 1;
+                    }
+                    finally
+                    {
+                        if (File.Exists(tmpFile)) File.Delete(tmpFile);
+                    }
+
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Done.");
+            WagoService.ResetDevice(_controller.Value);
+            Console.WriteLine("Restarting controller.");
+
             return 0;
         }
     }

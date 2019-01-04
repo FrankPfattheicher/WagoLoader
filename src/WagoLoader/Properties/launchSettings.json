@@ -2,7 +2,7 @@
   "profiles": {
     "WagoLoader": {
       "commandName": "Project",
-      "commandLineArgs": "load 192.168.2.165 test"
+      "commandLineArgs": "load 192.168.2.165 \"Controller V120_00\""
     }
   }
 }
