@@ -117,13 +117,16 @@ namespace WagoLoader.Commands
                 }
             }
 
+            // set timezone
+            // TODO
+
             // set WBM users as given in the packet
             Console.WriteLine("Loading WBM users...");
             const string pwdFileName = "lighttpd-htpasswd.user";
             try
             {
                 File.WriteAllText(pwdFileName, "");
-                var pwdFile = new Passwords(pwdFileName);
+                var pwdFile = new PasswordFile(pwdFileName);
                 foreach (var wbmUser in package.Specification.Users.Wbm)
                 {
                     pwdFile.SetPassword(wbmUser.Name, wbmUser.Password);

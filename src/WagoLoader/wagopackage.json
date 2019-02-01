@@ -2,7 +2,8 @@
   "description": "test package",
   "version": "1.0.0",
   "system": {
-    "product": "750-8202/0025-0002"
+    "product": "750-8202/0025-0002",
+    "timezone":  "Etc/UTC" 
   },
   "users": {
     "linux": [

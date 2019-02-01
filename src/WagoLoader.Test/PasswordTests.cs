@@ -1,4 +1,3 @@
-using System;
 using WagoLoader.Loader;
 using Xunit;
 
@@ -9,7 +8,7 @@ namespace WagoLoader.Test
         [Fact]
         public void KnownPasswordsShouldBeValid()
         {
-            var pwd = new Passwords("htpasswd.txt");
+            var pwd = new PasswordFile("htpasswd.txt");
 
             Assert.True(pwd.IsValid("admin", "test"));
             Assert.True(pwd.IsValid("user", "test"));
@@ -18,7 +17,7 @@ namespace WagoLoader.Test
         [Fact]
         public void OriginalWagoPasswordsShouldBeValid()
         {
-            var pwd = new Passwords("lighttpd-htpasswd.user");
+            var pwd = new PasswordFile("lighttpd-htpasswd.user");
 
             Assert.True(pwd.IsValid("admin", "wago"));
             Assert.True(pwd.IsValid("user", "user"));

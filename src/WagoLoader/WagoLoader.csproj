@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Loader\allzones" />
     <None Remove="wagopackage.json" />
   </ItemGroup>
 
@@ -16,6 +17,10 @@
     <Content Include="wagopackage.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Loader\allzones" />
   </ItemGroup>
 
   <ItemGroup>
