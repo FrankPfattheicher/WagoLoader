@@ -83,6 +83,7 @@ namespace WagoLoader.Commands
                 Console.WriteLine($"ERROR: No package specification file '{WagoPackage.SpecFileName}' found in {sourcePath}.");
                 return 1;
             }
+            Console.WriteLine($"package specification file {packageSpec}");
 
             var programName = Directory.EnumerateFiles(sourcePath, $"{Path.GetFileNameWithoutExtension(packageName)}.prg").FirstOrDefault();
             if (programName == null)

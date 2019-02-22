@@ -118,7 +118,12 @@ namespace WagoLoader.Commands
             }
 
             // set timezone
-            // TODO
+            var timezone = package.Specification.System.Timezone;
+            if (!string.IsNullOrEmpty(timezone))
+            {
+                Console.WriteLine("Setting time zone to " + timezone);
+                Timezone.SetTimezone(shell, rootPwd, timezone);
+            }
 
             // set WBM users as given in the packet
             Console.WriteLine("Loading WBM users...");
