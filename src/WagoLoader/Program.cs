@@ -11,6 +11,7 @@ namespace WagoLoader
     {
         private static void Main(string[] args)
         {
+            Console.WriteLine();
             Console.WriteLine("WAGO Loader v" + Assembly.GetEntryAssembly().GetName().Version);
             Console.WriteLine();
 

@@ -26,6 +26,7 @@ namespace WagoLoader.Commands
                 "The package name to be created (default is the project name)");
 
             _dstPath = command.Option("-o", "output path", CommandOptionType.SingleValue);
+            _dstPath.LongName = "output-path";
 
             command.OnExecute(() => Execute());
         }

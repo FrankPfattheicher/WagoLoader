@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Microsoft.Extensions.CommandLineUtils;
 using Renci.SshNet;
 using WagoLoader.Loader;
@@ -15,6 +16,7 @@ namespace WagoLoader.Commands
     {
         private static CommandArgument _controller;
         private static CommandArgument _package;
+        private static CommandOption _noReboot;
 
         internal static void Create(CommandLineApplication command)
         {
@@ -26,6 +28,9 @@ namespace WagoLoader.Commands
             _package = command.Argument(
                 "package",
                 "The package file name to load");
+
+            _noReboot = command.Option("-n", "no reboot", CommandOptionType.NoValue);
+            _noReboot.LongName = "no-reboot";
 
             command.OnExecute(() => Execute());
         }
@@ -122,7 +127,14 @@ namespace WagoLoader.Commands
             if (!string.IsNullOrEmpty(timezone))
             {
                 Console.WriteLine("Setting time zone to " + timezone);
-                Timezone.SetTimezone(shell, rootPwd, timezone);
+                EchoShellResponse(Timezone.SetTimezone(shell, rootPwd, timezone));
+            }
+
+            if (package.Specification.System.SetDateTime)
+            {
+                var utcNow = DateTime.UtcNow;
+                Console.WriteLine("Setting date and time to UTC " + utcNow);
+                EchoShellResponse(Clock.SetDateTime(shell, rootPwd, utcNow));
             }
 
             // set WBM users as given in the packet
@@ -211,7 +223,7 @@ namespace WagoLoader.Commands
                     .ToList();
                 foreach (var contentDirectory in contentDirectories)
                 {
-                    shell.ExecCommand("root", rootPwd, $"mkdir {contentDirectory}");
+                    EchoShellResponse(shell.ExecCommand("root", rootPwd, $"mkdir {contentDirectory}"));
                 }
 
                 Console.WriteLine($"Loading {contentFiles.Count} file system content files...");
@@ -255,10 +267,25 @@ namespace WagoLoader.Commands
             Console.WriteLine();
 
             Console.WriteLine("Done.");
+
+            if (_noReboot.HasValue())
+            {
+                Console.WriteLine("Do NOT restart controller.");
+                return 0;
+            }
+
             WagoService.ResetDevice(_controller.Value);
             Console.WriteLine("Restarting controller.");
 
             return 0;
         }
+
+        private static void EchoShellResponse(string response)
+        {
+            if (string.IsNullOrWhiteSpace(response)) return;
+
+            Console.WriteLine("  > " + response);
+        }
+
     }
 }

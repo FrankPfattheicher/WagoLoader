@@ -2,7 +2,7 @@
   "profiles": {
     "WagoLoader": {
       "commandName": "Project",
-      "commandLineArgs": "query 192.168.2.11"
+      "commandLineArgs": "load 192.168.2.130 \"C:\\Users\\Frank\\Documents\\ICT Baden\\ModoCorrente\\System\\Wago\\Controller V120_00\" -n"
     }
   }
 }

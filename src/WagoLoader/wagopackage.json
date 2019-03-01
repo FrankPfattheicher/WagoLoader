@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "system": {
     "product": "750-8202/0025-0002",
-    "timezone":  "Etc/UTC" 
+    "timezone": "Etc/UTC",
+    "setDateTime":  true 
   },
   "users": {
     "linux": [

@@ -38,13 +38,13 @@ namespace WagoLoader.Loader
             return false;
         }
 
-        public static void SetTimezone(RemoteShell shell, string rootPwd, string timezone)
+        public static string SetTimezone(RemoteShell shell, string rootPwd, string timezone)
         {
             // with root access execute
             // /etc/config-tools/config_timezone timezone=<timezone-value>
 
             var cmd = $"/etc/config-tools/config_timezone timezone={timezone}";
-            shell.ExecCommand("root", rootPwd, cmd);
+            return shell.ExecCommand("root", rootPwd, cmd);
         }
 
     }
