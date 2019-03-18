@@ -1,4 +1,5 @@
 
+* 0.0.10 - Target multiple product serial numbers.
 * 0.0.9 - Set clock from PC date and time.
 * 0.0.8 - Codesys and content packing and loading added.
 * 0.0.7 - Set linux and WBM users.

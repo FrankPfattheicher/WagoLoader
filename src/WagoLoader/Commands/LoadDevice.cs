@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Microsoft.Extensions.CommandLineUtils;
 using Renci.SshNet;
 using WagoLoader.Loader;
@@ -80,7 +79,9 @@ namespace WagoLoader.Commands
                 return 1;
             }
 
-            if (!package.Specification.System.Product.Contains(di.ProductSerialNumber))
+            var product = package.Specification.System.Products
+                .FirstOrDefault(p => p.SerialNumber == di.ProductSerialNumber);
+            if (product == null)
             {
                 Console.WriteLine($"ERROR: The target controller type ({di.ProductSerialNumber}) does not match the package specification.");
                 return 1;
@@ -177,7 +178,9 @@ namespace WagoLoader.Commands
             var tmpChk = Path.GetTempFileName();
             try
             {
-                Console.WriteLine("Loading Codesys project...");
+                var prgName = product.PackageName;
+                var chkName = Path.ChangeExtension(product.PackageName, "chk");
+                Console.WriteLine($"Loading Codesys project {prgName}...");
 
                 using (var scp = new ScpClient(_controller.Value, "root", rootPwd))
                 {
@@ -189,11 +192,11 @@ namespace WagoLoader.Commands
                         return 1;
                     }
 
-                    package.ExtractFile("DEFAULT.PRG", tmpPrg);
+                    package.ExtractFile(prgName, tmpPrg);
                     var prg = new FileInfo(tmpPrg);
                     scp.Upload(prg, "/home/codesys/DEFAULT.PRG");
 
-                    package.ExtractFile("DEFAULT.CHK", tmpChk);
+                    package.ExtractFile(chkName, tmpChk);
                     var chk = new FileInfo(tmpChk);
                     scp.Upload(chk, "/home/codesys/DEFAULT.CHK");
                 }

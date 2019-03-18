@@ -2,7 +2,16 @@
   "description": "test package",
   "version": "1.0.0",
   "system": {
-    "product": "750-8202/0025-0002",
+    "products": [
+      {
+        "serialNumber": "750-8202/0025-0001",
+        "packageName": "Controller V120_00_001.PRG"
+      },
+      {
+        "serialNumber": "750-8202/0025-0002",
+        "packageName": "Controller V120_00_002.PRG"
+      }
+    ],
     "timezone": "Etc/UTC",
     "setDateTime":  true 
   },

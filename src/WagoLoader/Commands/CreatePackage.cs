@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.CommandLineUtils;
+using Newtonsoft.Json;
 using WagoLoader.Loader;
 
 namespace WagoLoader.Commands
@@ -36,7 +37,7 @@ namespace WagoLoader.Commands
             var sourcePath = _srcPath.Value;
             if (string.IsNullOrEmpty(sourcePath))
             {
-                sourcePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                sourcePath = ".";
             }
 
             if (!Directory.Exists(sourcePath))
@@ -85,26 +86,29 @@ namespace WagoLoader.Commands
                 return 1;
             }
             Console.WriteLine($"package specification file {packageSpec}");
-
-            var programName = Directory.EnumerateFiles(sourcePath, $"{Path.GetFileNameWithoutExtension(packageName)}.prg").FirstOrDefault();
-            if (programName == null)
+            var json = File.ReadAllText(packageSpec);
+            var package = JsonConvert.DeserializeObject<PackageSpec>(json);
+            var products = package.System.Products;
+            
+            var projectFiles = new List<string>();
+            foreach (var product in products)
             {
-                programName = Directory.EnumerateFiles(sourcePath, "*.prg").FirstOrDefault();
+                var name = Path.GetFileNameWithoutExtension(product.PackageName);
+
+                var programName = Directory.EnumerateFiles(sourcePath, $"{name}.prg").FirstOrDefault();
                 if (programName == null)
                 {
-                    Console.WriteLine($"ERROR: No project file found in source path {sourcePath}.");
+                    Console.WriteLine($"ERROR: No project file ({name}.prg) found in source path {sourcePath}.");
                     return 1;
                 }
-                Console.WriteLine($"Using project file {Path.GetFileNameWithoutExtension(programName)}");
+                var checkName = Directory.EnumerateFiles(sourcePath, $"{name}.chk").FirstOrDefault();
+                if (checkName == null)
+                {
+                    Console.WriteLine($"ERROR: No checksum file ({name}.chk) found in source path {sourcePath}.");
+                    return 1;
+                }
+                projectFiles.Add(programName);
             }
-            var checkName = Directory.EnumerateFiles(sourcePath, $"{Path.GetFileNameWithoutExtension(programName)}.chk").FirstOrDefault();
-            if (checkName == null)
-            {
-                Console.WriteLine($"ERROR: No checksum file ({Path.GetFileNameWithoutExtension(programName)}.chk) found in source path {sourcePath}.");
-                return 1;
-            }
-
-
 
             Console.WriteLine();
 
@@ -121,8 +125,12 @@ namespace WagoLoader.Commands
                 zip.CreateEntryFromFile(packageSpec, WagoPackage.SpecFileName);
 
                 // add project files
-                zip.CreateEntryFromFile(programName, "DEFAULT.PRG");
-                zip.CreateEntryFromFile(checkName, "DEFAULT.CHK");
+                foreach (var projectFile in projectFiles)
+                {
+                    zip.CreateEntryFromFile(projectFile, Path.GetFileName(projectFile));
+                    var checkFile = Path.ChangeExtension(projectFile, "chk");
+                    zip.CreateEntryFromFile(checkFile, Path.GetFileName(checkFile));
+                }
 
                 // add content files
                 var contentDir = Path.Combine(sourcePath, "FileSystem");
