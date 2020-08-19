@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "WagoLoader": {
-      "commandName": "Project",
-      "commandLineArgs": "pack \"C:\\Users\\Frank\\Documents\\ICT Baden\\ModoCorrente\\System\\Wago\\Controller V120_00\" \"Controller V120_00\""
-    }
-  }
-}

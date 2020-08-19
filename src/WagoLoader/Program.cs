@@ -33,7 +33,19 @@ namespace WagoLoader
             }
             else
             {
-                app.Execute(args);
+                try
+                {
+                    app.Execute(args);
+                }
+                catch (CommandParsingException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    app.ShowHelp();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 

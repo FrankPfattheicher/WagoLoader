@@ -1,4 +1,5 @@
 
+* 0.1.1 - net core 3.1. Catch cmd line parsing errors. Do not pack .* files.
 * 0.0.10 - Target multiple product serial numbers.
 * 0.0.9 - Set clock from PC date and time.
 * 0.0.8 - Codesys and content packing and loading added.

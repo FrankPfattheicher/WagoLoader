@@ -136,7 +136,11 @@ namespace WagoLoader.Commands
                 var contentDir = Path.Combine(sourcePath, "FileSystem");
                 if (Directory.Exists(contentDir))
                 {
-                    var contentFiles = Directory.EnumerateFiles(contentDir, "*.*", SearchOption.AllDirectories);
+                    var hidden = Path.DirectorySeparatorChar + ".";
+                    var contentFiles = Directory
+                        .EnumerateFiles(contentDir, "*.*", SearchOption.AllDirectories)
+                        .Where(fn => !fn.Contains(hidden))
+                        .ToArray();
                     foreach (var contentFile in contentFiles)
                     {
                         var contentName = "filesystem" + contentFile.Substring(contentDir.Length);
