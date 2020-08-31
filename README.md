@@ -14,3 +14,7 @@ Load that package on a new system using network connection only.
 Anything missing - just ask for it!
 
 
+## Used IP Ports
+
+**22** SSH (SCP)    
+**6626** Device Info & Reset

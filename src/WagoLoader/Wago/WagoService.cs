@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WagoLoader.Wago
 {
-    public class WagoService
+    public static class WagoService
     {
         public static int PortNumber = 6626;
 
