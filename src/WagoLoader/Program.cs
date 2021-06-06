@@ -7,12 +7,12 @@ using WagoLoader.Wago;
 
 namespace WagoLoader
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("WAGO Loader v" + Assembly.GetEntryAssembly().GetName().Version);
+            Console.WriteLine("WAGO Loader v" + Assembly.GetEntryAssembly()!.GetName().Version);
             Console.WriteLine();
 
             var app = new CommandLineApplication

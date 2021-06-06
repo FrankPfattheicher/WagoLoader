@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://github.com/FrankPfattheicher/WagoLoader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FrankPfattheicher/WagoLoader</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>

@@ -2,12 +2,13 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace WagoLoader.Wago
 {
     public static class WagoService
     {
-        public static int PortNumber = 6626;
+         public static int PortNumber = 6626;
 
         public static DeviceInfo QueryDeviceInfo(string ipAddress)
         {
@@ -18,19 +19,17 @@ namespace WagoLoader.Wago
 
             try
             {
-                using (var client = new TcpClient())
-                {
-                    client.Connect(ipAddress, PortNumber);
-                    var stream = client.GetStream();
-                    stream.ReadTimeout = 1000;
-                    stream.Write(rqDeviceInfo, 0, rqDeviceInfo.Length);
+                using var client = new TcpClient();
+                client.Connect(ipAddress, PortNumber);
+                var stream = client.GetStream();
+                stream.ReadTimeout = 1000;
+                stream.Write(rqDeviceInfo, 0, rqDeviceInfo.Length);
 
-                    var rxBuffer = new byte[4096];
-                    var rxLength = stream.Read(rxBuffer, 0, rxBuffer.Length);
+                var rxBuffer = new byte[4096];
+                var rxLength = stream.Read(rxBuffer, 0, rxBuffer.Length);
 
-                    var text = Encoding.ASCII.GetString(rxBuffer, 28, rxLength - 29);
-                    return DeviceInfo.Parse(text);
-                }
+                var text = Encoding.ASCII.GetString(rxBuffer, 28, rxLength - 29);
+                return DeviceInfo.Parse(text);
             }
             catch (Exception ex)
             {
@@ -48,16 +47,14 @@ namespace WagoLoader.Wago
 
             try
             {
-                using (var client = new TcpClient())
-                {
-                    client.Connect(ipAddress, PortNumber);
-                    var stream = client.GetStream();
-                    stream.ReadTimeout = 1000;
-                    stream.Write(rqDeviceReset, 0, rqDeviceReset.Length);
+                using var client = new TcpClient();
+                client.Connect(ipAddress, PortNumber);
+                var stream = client.GetStream();
+                stream.ReadTimeout = 1000;
+                stream.Write(rqDeviceReset, 0, rqDeviceReset.Length);
 
-                    var rxBuffer = new byte[4096];
-                    stream.Read(rxBuffer, 0, rxBuffer.Length);
-                }
+                var rxBuffer = new byte[4096];
+                stream.Read(rxBuffer, 0, rxBuffer.Length);
             }
             catch (Exception ex)
             {
