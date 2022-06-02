@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WagoLoader.Loader
 {
@@ -36,7 +37,7 @@ namespace WagoLoader.Loader
                     }
 
                     var json = new StreamReader(spec.Open()).ReadToEnd();
-                    package.Specification = JsonConvert.DeserializeObject<PackageSpec>(json);
+                    package.Specification = JsonSerializer.Deserialize<PackageSpec>(json);
                     return package;
                 }
             }

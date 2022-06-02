@@ -1,4 +1,5 @@
 
+* 0.2.0 - net 6.0. Update packages, moved to System.Text.Json.
 * 0.1.1 - net core 3.1. Catch cmd line parsing errors. Do not pack .* files.
 * 0.0.10 - Target multiple product serial numbers.
 * 0.0.9 - Set clock from PC date and time.

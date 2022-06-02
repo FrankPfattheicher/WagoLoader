@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using WagoLoader.Loader;
 
 namespace WagoLoader.Commands
@@ -87,7 +87,12 @@ namespace WagoLoader.Commands
             }
             Console.WriteLine($"package specification file {packageSpec}");
             var json = File.ReadAllText(packageSpec);
-            var package = JsonConvert.DeserializeObject<PackageSpec>(json);
+            var package = JsonSerializer.Deserialize<PackageSpec>(json);
+            if (package == null)
+            {
+                Console.WriteLine($"ERROR: Failed to read package specification ({packageSpec}).");
+                return 1;
+            }
             var products = package.System.Products;
             
             var projectFiles = new List<string>();

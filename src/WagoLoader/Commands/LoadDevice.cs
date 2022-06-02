@@ -45,7 +45,7 @@ namespace WagoLoader.Commands
             var packageName = _package.Value;
             if (string.IsNullOrEmpty(packageName))
             {
-                var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                var path = Directory.GetCurrentDirectory();
                 packageName = Directory.EnumerateFiles(path, "*.wago").FirstOrDefault();
                 if (string.IsNullOrEmpty(packageName))
                 {
